@@ -1,0 +1,33 @@
+mariadb:
+  image: mariadb:latest
+  environment:
+    MYSQL_ROOT_PASSWORD: reallysecretpassword
+    MYSQL_DATABASE: maxscale_test
+    MYSQL_USER: myuser
+    MYSQL_PASSWORD: myreallysecretpassword
+
+maxscale:
+  build: maxscale
+  links:
+    - mariadb:mariadb
+  expose:
+    - "8003"
+  ports:
+    - 4008:4008
+    - 4006:4006
+    - 6603:6603
+    - 9003:9003
+
+backend:
+  build: nginx
+  links:
+    - maxscale:maxscale
+  ports:
+    - 8003:8003
+
+maxpanel:
+  build: maxpanel
+  ports:
+    - 8080:80
+  links:
+    - backend:backend
