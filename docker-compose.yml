@@ -9,7 +9,7 @@ mariadb:
 maxscale:
   build: maxscale
   links:
-    - mariadb:mariadb
+    - mariadb
   expose:
     - "8003"
   ports:
@@ -21,7 +21,7 @@ maxscale:
 backend:
   build: nginx
   links:
-    - maxscale:maxscale
+    - maxscale
   ports:
     - 8003:8003
 
@@ -30,4 +30,4 @@ maxpanel:
   ports:
     - 8080:80
   links:
-    - backend:backend
+    - backend

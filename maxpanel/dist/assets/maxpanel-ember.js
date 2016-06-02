@@ -9,7 +9,6 @@
 define('maxpanel-ember/adapters/application', ['exports', 'ember-data/adapters/json-api'], function (exports, _emberDataAdaptersJsonApi) {
   exports['default'] = _emberDataAdaptersJsonApi['default'].extend({
     namespace: 'api'
-    // host: 'http://172.17.0.1:8003'
   });
 });
 define('maxpanel-ember/adapters/status', ['exports', 'ember', 'maxpanel-ember/adapters/application'], function (exports, _ember, _maxpanelEmberAdaptersApplication) {
@@ -48,6 +47,9 @@ define('maxpanel-ember/components/app-version', ['exports', 'ember-cli-app-versi
 });
 define('maxpanel-ember/components/bubble-chart', ['exports', 'ember-charts/components/bubble-chart'], function (exports, _emberChartsComponentsBubbleChart) {
   exports['default'] = _emberChartsComponentsBubbleChart['default'];
+});
+define('maxpanel-ember/components/ember-chart', ['exports', 'ember-cli-chart/components/ember-chart'], function (exports, _emberCliChartComponentsEmberChart) {
+  exports['default'] = _emberCliChartComponentsEmberChart['default'];
 });
 define('maxpanel-ember/components/horizontal-bar-chart', ['exports', 'ember-charts/components/horizontal-bar-chart'], function (exports, _emberChartsComponentsHorizontalBarChart) {
   exports['default'] = _emberChartsComponentsHorizontalBarChart['default'];
@@ -109,74 +111,8 @@ define('maxpanel-ember/components/ui-sticky', ['exports', 'semantic-ui-ember/com
 define('maxpanel-ember/components/vertical-bar-chart', ['exports', 'ember-charts/components/vertical-bar-chart'], function (exports, _emberChartsComponentsVerticalBarChart) {
   exports['default'] = _emberChartsComponentsVerticalBarChart['default'];
 });
-define("maxpanel-ember/controllers/events/index", ["exports", "ember"], function (exports, _ember) {
-  exports["default"] = _ember["default"].Controller.extend({
-    content: [{
-      "label": "Connections Queued",
-      "group": "Group 1",
-      "value": 20
-    }, {
-      "label": "Connections Queued",
-      "group": "Group 2",
-      "value": 32
-    }, {
-      "label": "Connections Executed",
-      "group": "Group 1",
-      "value": 16
-    }, {
-      "label": "Connections Executed",
-      "group": "Group 2",
-      "value": 17
-    }, {
-      "label": "Connections Queued",
-      "group": "Group 3",
-      "value": 17
-    }, {
-      "label": "Connections Executed",
-      "group": "Group 3",
-      "value": 100
-    }, {
-      "label": "Connections Queued",
-      "group": "Group 4",
-      "value": 17
-    }, {
-      "label": "Connections Executed",
-      "group": "Group 4",
-      "value": 12
-    }, {
-      "label": "Connections Queued",
-      "group": "Group 5",
-      "value": 8
-    }, {
-      "label": "Connections Executed",
-      "group": "Group 5",
-      "value": 8
-    }, {
-      "label": "Connections Queued",
-      "group": "Group 6",
-      "value": 17
-    }, {
-      "label": "Connections Executed",
-      "group": "Group 6",
-      "value": 17
-    }, {
-      "label": "Connections Queued",
-      "group": "Group 7",
-      "value": 10
-    }, {
-      "label": "Connections Executed",
-      "group": "Group 7",
-      "value": 10
-    }, {
-      "label": "Connections Queued",
-      "group": "Group 8",
-      "value": 1
-    }, {
-      "label": "Connections Executed",
-      "group": "Group 8",
-      "value": 1
-    }]
-  });
+define('maxpanel-ember/controllers/events/index', ['exports', 'ember'], function (exports, _ember) {
+  exports['default'] = _ember['default'].Controller.extend({});
 });
 define('maxpanel-ember/helpers/pluralize', ['exports', 'ember-inflector/lib/helpers/pluralize'], function (exports, _emberInflectorLibHelpersPluralize) {
   exports['default'] = _emberInflectorLibHelpersPluralize['default'];
@@ -426,7 +362,7 @@ define('maxpanel-ember/router', ['exports', 'ember', 'maxpanel-ember/config/envi
     this.route('services', function () {});
     this.route('listeners', function () {});
     this.route('modules', function () {});
-    this.route('sessions', function () {});
+    this.route('sessions');
     this.route('clients', function () {});
     this.route('servers', function () {});
     this.route('events', function () {});
@@ -434,6 +370,7 @@ define('maxpanel-ember/router', ['exports', 'ember', 'maxpanel-ember/config/envi
     this.route('maxscale_sessions', function () {});
 
     this.route('event', function () {});
+    this.route('maxscale_session');
   });
 
   exports['default'] = Router;
@@ -452,9 +389,12 @@ define('maxpanel-ember/routes/clients/index', ['exports', 'ember'], function (ex
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('client');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('client');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -477,9 +417,12 @@ define('maxpanel-ember/routes/events/index', ['exports', 'ember'], function (exp
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('event');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('event');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -509,9 +452,12 @@ define('maxpanel-ember/routes/listeners/index', ['exports', 'ember'], function (
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('listener');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('listener');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -534,9 +480,12 @@ define('maxpanel-ember/routes/maxscale-sessions/index', ['exports', 'ember'], fu
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('maxscale-session');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('maxscale-session');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -559,9 +508,12 @@ define('maxpanel-ember/routes/modules/index', ['exports', 'ember'], function (ex
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('module');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('module');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -584,9 +536,12 @@ define('maxpanel-ember/routes/servers/index', ['exports', 'ember'], function (ex
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('server');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('server');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -609,9 +564,12 @@ define('maxpanel-ember/routes/services/index', ['exports', 'ember'], function (e
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('service');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('service');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -619,9 +577,6 @@ define('maxpanel-ember/routes/services/index', ['exports', 'ember'], function (e
       }
     }
   });
-});
-define('maxpanel-ember/routes/sessions/index', ['exports', 'ember'], function (exports, _ember) {
-  exports['default'] = _ember['default'].Route.extend({});
 });
 define('maxpanel-ember/routes/status/index', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({
@@ -637,9 +592,12 @@ define('maxpanel-ember/routes/status/index', ['exports', 'ember'], function (exp
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('status');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('status');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -662,9 +620,12 @@ define('maxpanel-ember/routes/variables/index', ['exports', 'ember'], function (
       _ember['default'].run.later(this, this.refresh, 1000);
     },
     refresh: function refresh() {
-      if (!this.get('refreshing')) return;
-      this.store.findAll('variable');
-      _ember['default'].run.later(this, this.refresh, 1000);
+      if (!this.get('refreshing')) {
+        return;
+      } else {
+        this.store.findAll('variable');
+        _ember['default'].run.later(this, this.refresh, 1000);
+      }
     },
     actions: {
       willTransition: function willTransition() {
@@ -765,7 +726,7 @@ define('maxpanel-ember/serializers/maxscale-session', ['exports', 'ember', 'embe
         var normalizedKeys = (0, _npmCamelcaseKeys['default'])(client);
 
         var entry = {
-          id: i,
+          id: normalizedKeys.session,
           type: primaryModelClass.modelName,
           attributes: {
             'session': normalizedKeys.session,
@@ -1380,7 +1341,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
         morphs[10] = dom.createMorphAt(dom.childAt(fragment, [2]), 1, 1);
         return morphs;
       },
-      statements: [["block", "link-to", ["index"], ["class", "item"], 0, null, ["loc", [null, [2, 2], [4, 14]]]], ["block", "link-to", ["variables.index"], ["class", "item"], 1, null, ["loc", [null, [5, 2], [7, 14]]]], ["block", "link-to", ["status.index"], ["class", "item"], 2, null, ["loc", [null, [8, 2], [10, 14]]]], ["block", "link-to", ["services.index"], ["class", "item"], 3, null, ["loc", [null, [11, 2], [13, 14]]]], ["block", "link-to", ["listeners.index"], ["class", "item"], 4, null, ["loc", [null, [14, 2], [16, 14]]]], ["block", "link-to", ["modules.index"], ["class", "item"], 5, null, ["loc", [null, [17, 2], [19, 14]]]], ["block", "link-to", ["sessions.index"], ["class", "item"], 6, null, ["loc", [null, [20, 2], [22, 14]]]], ["block", "link-to", ["clients.index"], ["class", "item"], 7, null, ["loc", [null, [23, 2], [25, 14]]]], ["block", "link-to", ["servers.index"], ["class", "item"], 8, null, ["loc", [null, [26, 2], [28, 14]]]], ["block", "link-to", ["events.index"], ["class", "item"], 9, null, ["loc", [null, [29, 2], [31, 14]]]], ["content", "outlet", ["loc", [null, [40, 2], [40, 12]]]]],
+      statements: [["block", "link-to", ["index"], ["class", "item"], 0, null, ["loc", [null, [2, 2], [4, 14]]]], ["block", "link-to", ["variables.index"], ["class", "item"], 1, null, ["loc", [null, [5, 2], [7, 14]]]], ["block", "link-to", ["status.index"], ["class", "item"], 2, null, ["loc", [null, [8, 2], [10, 14]]]], ["block", "link-to", ["services.index"], ["class", "item"], 3, null, ["loc", [null, [11, 2], [13, 14]]]], ["block", "link-to", ["listeners.index"], ["class", "item"], 4, null, ["loc", [null, [14, 2], [16, 14]]]], ["block", "link-to", ["modules.index"], ["class", "item"], 5, null, ["loc", [null, [17, 2], [19, 14]]]], ["block", "link-to", ["maxscale_sessions.index"], ["class", "item"], 6, null, ["loc", [null, [20, 2], [22, 14]]]], ["block", "link-to", ["clients.index"], ["class", "item"], 7, null, ["loc", [null, [23, 2], [25, 14]]]], ["block", "link-to", ["servers.index"], ["class", "item"], 8, null, ["loc", [null, [26, 2], [28, 14]]]], ["block", "link-to", ["events.index"], ["class", "item"], 9, null, ["loc", [null, [29, 2], [31, 14]]]], ["content", "outlet", ["loc", [null, [40, 2], [40, 12]]]]],
       locals: [],
       templates: [child0, child1, child2, child3, child4, child5, child6, child7, child8, child9]
     };
@@ -2180,11 +2141,83 @@ define("maxpanel-ember/templates/listeners/index", ["exports"], function (export
 });
 define("maxpanel-ember/templates/maxscale-sessions/index", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template((function () {
+    var child0 = (function () {
+      return {
+        meta: {
+          "fragmentReason": false,
+          "revision": "Ember@2.5.0",
+          "loc": {
+            "source": null,
+            "start": {
+              "line": 12,
+              "column": 4
+            },
+            "end": {
+              "line": 19,
+              "column": 4
+            }
+          },
+          "moduleName": "maxpanel-ember/templates/maxscale-sessions/index.hbs"
+        },
+        isEmpty: false,
+        arity: 1,
+        cachedFragment: null,
+        hasRendered: false,
+        buildFragment: function buildFragment(dom) {
+          var el0 = dom.createDocumentFragment();
+          var el1 = dom.createTextNode("      ");
+          dom.appendChild(el0, el1);
+          var el1 = dom.createElement("tr");
+          var el2 = dom.createTextNode("\n        ");
+          dom.appendChild(el1, el2);
+          var el2 = dom.createElement("td");
+          var el3 = dom.createComment("");
+          dom.appendChild(el2, el3);
+          dom.appendChild(el1, el2);
+          var el2 = dom.createTextNode("\n        ");
+          dom.appendChild(el1, el2);
+          var el2 = dom.createElement("td");
+          var el3 = dom.createComment("");
+          dom.appendChild(el2, el3);
+          dom.appendChild(el1, el2);
+          var el2 = dom.createTextNode("\n        ");
+          dom.appendChild(el1, el2);
+          var el2 = dom.createElement("td");
+          var el3 = dom.createComment("");
+          dom.appendChild(el2, el3);
+          dom.appendChild(el1, el2);
+          var el2 = dom.createTextNode("\n        ");
+          dom.appendChild(el1, el2);
+          var el2 = dom.createElement("td");
+          var el3 = dom.createComment("");
+          dom.appendChild(el2, el3);
+          dom.appendChild(el1, el2);
+          var el2 = dom.createTextNode("\n      ");
+          dom.appendChild(el1, el2);
+          dom.appendChild(el0, el1);
+          var el1 = dom.createTextNode("\n");
+          dom.appendChild(el0, el1);
+          return el0;
+        },
+        buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
+          var element0 = dom.childAt(fragment, [1]);
+          var morphs = new Array(4);
+          morphs[0] = dom.createMorphAt(dom.childAt(element0, [1]), 0, 0);
+          morphs[1] = dom.createMorphAt(dom.childAt(element0, [3]), 0, 0);
+          morphs[2] = dom.createMorphAt(dom.childAt(element0, [5]), 0, 0);
+          morphs[3] = dom.createMorphAt(dom.childAt(element0, [7]), 0, 0);
+          return morphs;
+        },
+        statements: [["content", "session.session", ["loc", [null, [14, 12], [14, 31]]]], ["content", "session.client", ["loc", [null, [15, 12], [15, 30]]]], ["content", "session.service", ["loc", [null, [16, 12], [16, 31]]]], ["content", "session.state", ["loc", [null, [17, 12], [17, 29]]]]],
+        locals: ["session"],
+        templates: []
+      };
+    })();
     return {
       meta: {
         "fragmentReason": {
           "name": "missing-wrapper",
-          "problems": ["wrong-type"]
+          "problems": ["multiple-nodes"]
         },
         "revision": "Ember@2.5.0",
         "loc": {
@@ -2194,7 +2227,7 @@ define("maxpanel-ember/templates/maxscale-sessions/index", ["exports"], function
             "column": 0
           },
           "end": {
-            "line": 2,
+            "line": 26,
             "column": 0
           }
         },
@@ -2206,7 +2239,68 @@ define("maxpanel-ember/templates/maxscale-sessions/index", ["exports"], function
       hasRendered: false,
       buildFragment: function buildFragment(dom) {
         var el0 = dom.createDocumentFragment();
-        var el1 = dom.createComment("");
+        var el1 = dom.createElement("h2");
+        var el2 = dom.createTextNode("Status");
+        dom.appendChild(el1, el2);
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createElement("table");
+        dom.setAttribute(el1, "class", "ui celled table");
+        var el2 = dom.createTextNode("\n  ");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("thead");
+        var el3 = dom.createTextNode("\n    ");
+        dom.appendChild(el2, el3);
+        var el3 = dom.createElement("tr");
+        var el4 = dom.createTextNode("\n      ");
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("th");
+        var el5 = dom.createTextNode("Session");
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        var el4 = dom.createTextNode("\n      ");
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("th");
+        var el5 = dom.createTextNode("Client");
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        var el4 = dom.createTextNode("\n      ");
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("th");
+        var el5 = dom.createTextNode("Service");
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        var el4 = dom.createTextNode("\n      ");
+        dom.appendChild(el3, el4);
+        var el4 = dom.createElement("th");
+        var el5 = dom.createTextNode("State");
+        dom.appendChild(el4, el5);
+        dom.appendChild(el3, el4);
+        var el4 = dom.createTextNode("\n    ");
+        dom.appendChild(el3, el4);
+        dom.appendChild(el2, el3);
+        var el3 = dom.createTextNode("\n  ");
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createTextNode("\n  ");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("tbody");
+        var el3 = dom.createTextNode("\n");
+        dom.appendChild(el2, el3);
+        var el3 = dom.createComment("");
+        dom.appendChild(el2, el3);
+        var el3 = dom.createTextNode("\n  ");
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createTextNode("\n  ");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createElement("tfoot");
+        var el3 = dom.createTextNode("\n\n  ");
+        dom.appendChild(el2, el3);
+        dom.appendChild(el1, el2);
+        var el2 = dom.createTextNode("\n");
+        dom.appendChild(el1, el2);
         dom.appendChild(el0, el1);
         var el1 = dom.createTextNode("\n");
         dom.appendChild(el0, el1);
@@ -2214,13 +2308,12 @@ define("maxpanel-ember/templates/maxscale-sessions/index", ["exports"], function
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
         var morphs = new Array(1);
-        morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
-        dom.insertBoundary(fragment, 0);
+        morphs[0] = dom.createMorphAt(dom.childAt(fragment, [2, 3]), 1, 1);
         return morphs;
       },
-      statements: [["content", "outlet", ["loc", [null, [1, 0], [1, 10]]]]],
+      statements: [["block", "each", [["get", "model", ["loc", [null, [12, 12], [12, 17]]]]], [], 0, null, ["loc", [null, [12, 4], [19, 13]]]]],
       locals: [],
-      templates: []
+      templates: [child0]
     };
   })());
 });
@@ -2784,48 +2877,6 @@ define("maxpanel-ember/templates/services/index", ["exports"], function (exports
     };
   })());
 });
-define("maxpanel-ember/templates/sessions/index", ["exports"], function (exports) {
-  exports["default"] = Ember.HTMLBars.template((function () {
-    return {
-      meta: {
-        "fragmentReason": false,
-        "revision": "Ember@2.5.0",
-        "loc": {
-          "source": null,
-          "start": {
-            "line": 1,
-            "column": 0
-          },
-          "end": {
-            "line": 2,
-            "column": 0
-          }
-        },
-        "moduleName": "maxpanel-ember/templates/sessions/index.hbs"
-      },
-      isEmpty: false,
-      arity: 0,
-      cachedFragment: null,
-      hasRendered: false,
-      buildFragment: function buildFragment(dom) {
-        var el0 = dom.createDocumentFragment();
-        var el1 = dom.createElement("i");
-        var el2 = dom.createTextNode("The JSON response from MaxScale is currently invalid, but is fixed in MaxScale 1.5");
-        dom.appendChild(el1, el2);
-        dom.appendChild(el0, el1);
-        var el1 = dom.createTextNode("\n");
-        dom.appendChild(el0, el1);
-        return el0;
-      },
-      buildRenderNodes: function buildRenderNodes() {
-        return [];
-      },
-      statements: [],
-      locals: [],
-      templates: []
-    };
-  })());
-});
 define("maxpanel-ember/templates/status/index", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template((function () {
     var child0 = (function () {
@@ -3204,7 +3255,7 @@ catch(err) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("maxpanel-ember/app")["default"].create({"name":"maxpanel-ember","version":"0.0.0+ba620105"});
+  require("maxpanel-ember/app")["default"].create({"name":"maxpanel-ember","version":"0.0.0+9cd86aab"});
 }
 
 /* jshint ignore:end */

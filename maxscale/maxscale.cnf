@@ -8,6 +8,7 @@
 
 [maxscale]
 threads=1
+log_debug=1
 
 # Server definitions
 #
