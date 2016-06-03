@@ -8,7 +8,7 @@
 
 define('maxpanel-ember/adapters/application', ['exports', 'ember-data/adapters/json-api'], function (exports, _emberDataAdaptersJsonApi) {
   exports['default'] = _emberDataAdaptersJsonApi['default'].extend({
-    namespace: 'api'
+    host: 'http://10.190.0.5:8003'
   });
 });
 define('maxpanel-ember/adapters/status', ['exports', 'ember', 'maxpanel-ember/adapters/application'], function (exports, _ember, _maxpanelEmberAdaptersApplication) {
@@ -45,23 +45,8 @@ define('maxpanel-ember/components/app-version', ['exports', 'ember-cli-app-versi
     name: name
   });
 });
-define('maxpanel-ember/components/bubble-chart', ['exports', 'ember-charts/components/bubble-chart'], function (exports, _emberChartsComponentsBubbleChart) {
-  exports['default'] = _emberChartsComponentsBubbleChart['default'];
-});
-define('maxpanel-ember/components/ember-chart', ['exports', 'ember-cli-chart/components/ember-chart'], function (exports, _emberCliChartComponentsEmberChart) {
-  exports['default'] = _emberCliChartComponentsEmberChart['default'];
-});
-define('maxpanel-ember/components/horizontal-bar-chart', ['exports', 'ember-charts/components/horizontal-bar-chart'], function (exports, _emberChartsComponentsHorizontalBarChart) {
-  exports['default'] = _emberChartsComponentsHorizontalBarChart['default'];
-});
-define('maxpanel-ember/components/pie-chart', ['exports', 'ember-charts/components/pie-chart'], function (exports, _emberChartsComponentsPieChart) {
-  exports['default'] = _emberChartsComponentsPieChart['default'];
-});
-define('maxpanel-ember/components/scatter-chart', ['exports', 'ember-charts/components/scatter-chart'], function (exports, _emberChartsComponentsScatterChart) {
-  exports['default'] = _emberChartsComponentsScatterChart['default'];
-});
-define('maxpanel-ember/components/time-series-chart', ['exports', 'ember-charts/components/time-series-chart'], function (exports, _emberChartsComponentsTimeSeriesChart) {
-  exports['default'] = _emberChartsComponentsTimeSeriesChart['default'];
+define('maxpanel-ember/components/high-charts', ['exports', 'ember-highcharts/components/high-charts'], function (exports, _emberHighchartsComponentsHighCharts) {
+  exports['default'] = _emberHighchartsComponentsHighCharts['default'];
 });
 define('maxpanel-ember/components/ui-accordion', ['exports', 'semantic-ui-ember/components/ui-accordion'], function (exports, _semanticUiEmberComponentsUiAccordion) {
   exports['default'] = _semanticUiEmberComponentsUiAccordion['default'];
@@ -108,11 +93,81 @@ define('maxpanel-ember/components/ui-sidebar', ['exports', 'semantic-ui-ember/co
 define('maxpanel-ember/components/ui-sticky', ['exports', 'semantic-ui-ember/components/ui-sticky'], function (exports, _semanticUiEmberComponentsUiSticky) {
   exports['default'] = _semanticUiEmberComponentsUiSticky['default'];
 });
-define('maxpanel-ember/components/vertical-bar-chart', ['exports', 'ember-charts/components/vertical-bar-chart'], function (exports, _emberChartsComponentsVerticalBarChart) {
-  exports['default'] = _emberChartsComponentsVerticalBarChart['default'];
-});
 define('maxpanel-ember/controllers/events/index', ['exports', 'ember'], function (exports, _ember) {
-  exports['default'] = _ember['default'].Controller.extend({});
+  // import defaultTheme from '../themes/default-theme';
+
+  exports['default'] = _ember['default'].Controller.extend({
+    chartOptions: _ember['default'].computed('model', function () {
+      return {
+        chart: {
+          type: "column"
+        },
+        title: {
+          text: "Events"
+        },
+        xAxis: {
+          categories: this.get('model').mapBy('duration')
+        },
+        yAxis: {
+          title: {
+            text: 'Event Count'
+          }
+        }
+      };
+    }),
+
+    chartData: _ember['default'].computed('model.@each.queued', function () {
+      return [{
+        name: 'Queued',
+        data: this.get('model').mapBy('queued').map(function (i) {
+          return +i;
+        })
+      }, {
+        name: 'Executed',
+        data: this.get('model').mapBy('executed').map(function (i) {
+          return +i;
+        })
+      }];
+    })
+
+  });
+});
+define("maxpanel-ember/helpers/cellstate", ["exports", "ember"], function (exports, _ember) {
+  exports.cellstate = cellstate;
+
+  function cellstate(params /*, hash*/) {
+    var downConditions = ["Stopped", "Down"];
+    var upConditions = ["Running", "Master, Running", "GA"];
+    var warningConditions = ["In Development", "Alpha"];
+    if (downConditions.contains(params.toString())) {
+      return "cell negative";
+    } else if (upConditions.contains(params.toString())) {
+      return "cell positive";
+    } else if (warningConditions.contains(params.toString())) {
+      return "cell warning";
+    } else {
+      return "cell";
+    }
+  }
+
+  exports["default"] = _ember["default"].Helper.helper(cellstate);
+});
+define("maxpanel-ember/helpers/listener-row-state", ["exports", "ember"], function (exports, _ember) {
+  exports.listenerRowState = listenerRowState;
+
+  function listenerRowState(params /*, hash*/) {
+    var downConditions = ["Stopped", "Down"];
+    var warningConditions = ["In Development", "Alpha"];
+    if (downConditions.contains(params.toString())) {
+      return "row negative";
+    } else if (warningConditions.contains(params.toString())) {
+      return "row warning";
+    } else {
+      return "cell";
+    }
+  }
+
+  exports["default"] = _ember["default"].Helper.helper(listenerRowState);
 });
 define('maxpanel-ember/helpers/pluralize', ['exports', 'ember-inflector/lib/helpers/pluralize'], function (exports, _emberInflectorLibHelpersPluralize) {
   exports['default'] = _emberInflectorLibHelpersPluralize['default'];
@@ -891,7 +946,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -933,7 +988,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -969,7 +1024,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1005,7 +1060,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1041,7 +1096,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1077,7 +1132,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1113,7 +1168,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1149,7 +1204,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1185,7 +1240,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1221,7 +1276,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1259,7 +1314,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -1353,7 +1408,7 @@ define("maxpanel-ember/templates/clients/index", ["exports"], function (exports)
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -1427,7 +1482,7 @@ define("maxpanel-ember/templates/clients/index", ["exports"], function (exports)
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -1525,12 +1580,15 @@ define("maxpanel-ember/templates/clients/index", ["exports"], function (exports)
     };
   })());
 });
-define("maxpanel-ember/templates/components/chart-component", ["exports"], function (exports) {
+define("maxpanel-ember/templates/components/high-charts", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template((function () {
     return {
       meta: {
-        "fragmentReason": false,
-        "revision": "Ember@2.5.0",
+        "fragmentReason": {
+          "name": "missing-wrapper",
+          "problems": ["wrong-type"]
+        },
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -1538,11 +1596,11 @@ define("maxpanel-ember/templates/components/chart-component", ["exports"], funct
             "column": 0
           },
           "end": {
-            "line": 3,
-            "column": 6
+            "line": 2,
+            "column": 0
           }
         },
-        "moduleName": "maxpanel-ember/templates/components/chart-component.hbs"
+        "moduleName": "maxpanel-ember/templates/components/high-charts.hbs"
       },
       isEmpty: false,
       arity: 0,
@@ -1550,28 +1608,19 @@ define("maxpanel-ember/templates/components/chart-component", ["exports"], funct
       hasRendered: false,
       buildFragment: function buildFragment(dom) {
         var el0 = dom.createDocumentFragment();
-        dom.setNamespace("http://www.w3.org/2000/svg");
-        var el1 = dom.createElement("svg");
-        var el2 = dom.createTextNode("\n  ");
-        dom.appendChild(el1, el2);
-        var el2 = dom.createElement("g");
-        dom.setAttribute(el2, "class", "chart-viewport");
-        dom.appendChild(el1, el2);
-        var el2 = dom.createTextNode("\n");
-        dom.appendChild(el1, el2);
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
         dom.appendChild(el0, el1);
         return el0;
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
-        var element0 = dom.childAt(fragment, [0]);
-        var element1 = dom.childAt(element0, [1]);
-        var morphs = new Array(3);
-        morphs[0] = dom.createAttrMorph(element0, 'width');
-        morphs[1] = dom.createAttrMorph(element0, 'height');
-        morphs[2] = dom.createAttrMorph(element1, 'transform');
+        var morphs = new Array(1);
+        morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+        dom.insertBoundary(fragment, 0);
         return morphs;
       },
-      statements: [["attribute", "width", ["get", "outerWidth", ["loc", [null, [1, 13], [1, 23]]]]], ["attribute", "height", ["get", "outerHeight", ["loc", [null, [1, 35], [1, 46]]]]], ["attribute", "transform", ["get", "transformViewport", ["loc", [null, [2, 40], [2, 57]]]]]],
+      statements: [["content", "yield", ["loc", [null, [1, 0], [1, 9]]]]],
       locals: [],
       templates: []
     };
@@ -1585,7 +1634,7 @@ define("maxpanel-ember/templates/components/ui-checkbox", ["exports"], function 
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -1645,7 +1694,7 @@ define("maxpanel-ember/templates/components/ui-dropdown", ["exports"], function 
           "name": "missing-wrapper",
           "problems": ["wrong-type"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -1691,7 +1740,7 @@ define("maxpanel-ember/templates/components/ui-modal", ["exports"], function (ex
           "name": "missing-wrapper",
           "problems": ["wrong-type"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -1737,7 +1786,7 @@ define("maxpanel-ember/templates/components/ui-radio", ["exports"], function (ex
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -1795,15 +1844,15 @@ define("maxpanel-ember/templates/events/index", ["exports"], function (exports) 
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
-              "line": 11,
+              "line": 12,
               "column": 4
             },
             "end": {
-              "line": 17,
+              "line": 18,
               "column": 4
             }
           },
@@ -1851,7 +1900,7 @@ define("maxpanel-ember/templates/events/index", ["exports"], function (exports) 
           morphs[2] = dom.createMorphAt(dom.childAt(element0, [5]), 0, 0);
           return morphs;
         },
-        statements: [["content", "event.duration", ["loc", [null, [13, 12], [13, 30]]]], ["content", "event.queued", ["loc", [null, [14, 12], [14, 28]]]], ["content", "event.executed", ["loc", [null, [15, 12], [15, 30]]]]],
+        statements: [["content", "event.duration", ["loc", [null, [14, 12], [14, 30]]]], ["content", "event.queued", ["loc", [null, [15, 12], [15, 28]]]], ["content", "event.executed", ["loc", [null, [16, 12], [16, 30]]]]],
         locals: ["event"],
         templates: []
       };
@@ -1860,9 +1909,9 @@ define("maxpanel-ember/templates/events/index", ["exports"], function (exports) 
       meta: {
         "fragmentReason": {
           "name": "missing-wrapper",
-          "problems": ["multiple-nodes"]
+          "problems": ["wrong-type", "multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -1870,7 +1919,7 @@ define("maxpanel-ember/templates/events/index", ["exports"], function (exports) 
             "column": 0
           },
           "end": {
-            "line": 20,
+            "line": 21,
             "column": 0
           }
         },
@@ -1882,6 +1931,10 @@ define("maxpanel-ember/templates/events/index", ["exports"], function (exports) 
       hasRendered: false,
       buildFragment: function buildFragment(dom) {
         var el0 = dom.createDocumentFragment();
+        var el1 = dom.createComment("");
+        dom.appendChild(el0, el1);
+        var el1 = dom.createTextNode("\n");
+        dom.appendChild(el0, el1);
         var el1 = dom.createElement("h2");
         var el2 = dom.createTextNode("Event Times");
         dom.appendChild(el1, el2);
@@ -1938,11 +1991,13 @@ define("maxpanel-ember/templates/events/index", ["exports"], function (exports) 
         return el0;
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
-        var morphs = new Array(1);
-        morphs[0] = dom.createMorphAt(dom.childAt(fragment, [2, 3]), 1, 1);
+        var morphs = new Array(2);
+        morphs[0] = dom.createMorphAt(fragment, 0, 0, contextualElement);
+        morphs[1] = dom.createMorphAt(dom.childAt(fragment, [4, 3]), 1, 1);
+        dom.insertBoundary(fragment, 0);
         return morphs;
       },
-      statements: [["block", "each", [["get", "model", ["loc", [null, [11, 12], [11, 17]]]]], [], 0, null, ["loc", [null, [11, 4], [17, 13]]]]],
+      statements: [["inline", "high-charts", [], ["chartOptions", ["subexpr", "@mut", [["get", "chartOptions", ["loc", [null, [1, 27], [1, 39]]]]], [], []], "content", ["subexpr", "@mut", [["get", "chartData", ["loc", [null, [1, 48], [1, 57]]]]], [], []], "theme", ["subexpr", "@mut", [["get", "theme", ["loc", [null, [1, 64], [1, 69]]]]], [], []]], ["loc", [null, [1, 0], [1, 71]]]], ["block", "each", [["get", "model", ["loc", [null, [12, 12], [12, 17]]]]], [], 0, null, ["loc", [null, [12, 4], [18, 13]]]]],
       locals: [],
       templates: [child0]
     };
@@ -1954,7 +2009,7 @@ define("maxpanel-ember/templates/listeners/index", ["exports"], function (export
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -2016,15 +2071,18 @@ define("maxpanel-ember/templates/listeners/index", ["exports"], function (export
         },
         buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
           var element0 = dom.childAt(fragment, [1]);
-          var morphs = new Array(5);
-          morphs[0] = dom.createMorphAt(dom.childAt(element0, [1]), 0, 0);
-          morphs[1] = dom.createMorphAt(dom.childAt(element0, [3]), 0, 0);
-          morphs[2] = dom.createMorphAt(dom.childAt(element0, [5]), 0, 0);
-          morphs[3] = dom.createMorphAt(dom.childAt(element0, [7]), 0, 0);
-          morphs[4] = dom.createMorphAt(dom.childAt(element0, [9]), 0, 0);
+          var element1 = dom.childAt(element0, [9]);
+          var morphs = new Array(7);
+          morphs[0] = dom.createAttrMorph(element0, 'class');
+          morphs[1] = dom.createMorphAt(dom.childAt(element0, [1]), 0, 0);
+          morphs[2] = dom.createMorphAt(dom.childAt(element0, [3]), 0, 0);
+          morphs[3] = dom.createMorphAt(dom.childAt(element0, [5]), 0, 0);
+          morphs[4] = dom.createMorphAt(dom.childAt(element0, [7]), 0, 0);
+          morphs[5] = dom.createAttrMorph(element1, 'class');
+          morphs[6] = dom.createMorphAt(element1, 0, 0);
           return morphs;
         },
-        statements: [["content", "listener.name", ["loc", [null, [15, 12], [15, 29]]]], ["content", "listener.protocolmodule", ["loc", [null, [16, 12], [16, 39]]]], ["content", "listener.address", ["loc", [null, [17, 12], [17, 32]]]], ["content", "listener.port", ["loc", [null, [18, 12], [18, 29]]]], ["content", "listener.state", ["loc", [null, [19, 12], [19, 30]]]]],
+        statements: [["attribute", "class", ["subexpr", "listenerRowState", [["get", "listener.state", ["loc", [null, [14, 36], [14, 50]]]]], [], ["loc", [null, [14, 16], [14, 53]]]]], ["content", "listener.name", ["loc", [null, [15, 12], [15, 29]]]], ["content", "listener.protocolmodule", ["loc", [null, [16, 12], [16, 39]]]], ["content", "listener.address", ["loc", [null, [17, 12], [17, 32]]]], ["content", "listener.port", ["loc", [null, [18, 12], [18, 29]]]], ["attribute", "class", ["concat", [["subexpr", "cellstate", [["get", "listener.state", ["loc", [null, [19, 31], [19, 45]]]]], [], ["loc", [null, [19, 19], [19, 47]]]]]]], ["content", "listener.state", ["loc", [null, [19, 49], [19, 67]]]]],
         locals: ["listener"],
         templates: []
       };
@@ -2035,7 +2093,7 @@ define("maxpanel-ember/templates/listeners/index", ["exports"], function (export
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -2145,7 +2203,7 @@ define("maxpanel-ember/templates/maxscale-sessions/index", ["exports"], function
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -2219,7 +2277,7 @@ define("maxpanel-ember/templates/maxscale-sessions/index", ["exports"], function
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -2240,7 +2298,7 @@ define("maxpanel-ember/templates/maxscale-sessions/index", ["exports"], function
       buildFragment: function buildFragment(dom) {
         var el0 = dom.createDocumentFragment();
         var el1 = dom.createElement("h2");
-        var el2 = dom.createTextNode("Status");
+        var el2 = dom.createTextNode("Sessions");
         dom.appendChild(el1, el2);
         dom.appendChild(el0, el1);
         var el1 = dom.createTextNode("\n");
@@ -2323,7 +2381,7 @@ define("maxpanel-ember/templates/modules/index", ["exports"], function (exports)
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -2385,15 +2443,18 @@ define("maxpanel-ember/templates/modules/index", ["exports"], function (exports)
         },
         buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
           var element0 = dom.childAt(fragment, [1]);
-          var morphs = new Array(5);
-          morphs[0] = dom.createMorphAt(dom.childAt(element0, [1]), 0, 0);
-          morphs[1] = dom.createMorphAt(dom.childAt(element0, [3]), 0, 0);
-          morphs[2] = dom.createMorphAt(dom.childAt(element0, [5]), 0, 0);
-          morphs[3] = dom.createMorphAt(dom.childAt(element0, [7]), 0, 0);
-          morphs[4] = dom.createMorphAt(dom.childAt(element0, [9]), 0, 0);
+          var element1 = dom.childAt(element0, [9]);
+          var morphs = new Array(7);
+          morphs[0] = dom.createAttrMorph(element0, 'class');
+          morphs[1] = dom.createMorphAt(dom.childAt(element0, [1]), 0, 0);
+          morphs[2] = dom.createMorphAt(dom.childAt(element0, [3]), 0, 0);
+          morphs[3] = dom.createMorphAt(dom.childAt(element0, [5]), 0, 0);
+          morphs[4] = dom.createMorphAt(dom.childAt(element0, [7]), 0, 0);
+          morphs[5] = dom.createAttrMorph(element1, 'class');
+          morphs[6] = dom.createMorphAt(element1, 0, 0);
           return morphs;
         },
-        statements: [["content", "module.name", ["loc", [null, [15, 12], [15, 27]]]], ["content", "module.type", ["loc", [null, [16, 12], [16, 27]]]], ["content", "module.version", ["loc", [null, [17, 12], [17, 30]]]], ["content", "module.apiversion", ["loc", [null, [18, 12], [18, 33]]]], ["content", "module.status", ["loc", [null, [19, 12], [19, 29]]]]],
+        statements: [["attribute", "class", ["subexpr", "listenerRowState", [["get", "module.status", ["loc", [null, [14, 36], [14, 49]]]]], [], ["loc", [null, [14, 16], [14, 52]]]]], ["content", "module.name", ["loc", [null, [15, 12], [15, 27]]]], ["content", "module.type", ["loc", [null, [16, 12], [16, 27]]]], ["content", "module.version", ["loc", [null, [17, 12], [17, 30]]]], ["content", "module.apiversion", ["loc", [null, [18, 12], [18, 33]]]], ["attribute", "class", ["subexpr", "cellstate", [["get", "module.status", ["loc", [null, [19, 31], [19, 44]]]]], [], ["loc", [null, [19, 18], [19, 47]]]]], ["content", "module.status", ["loc", [null, [19, 48], [19, 65]]]]],
         locals: ["module"],
         templates: []
       };
@@ -2404,7 +2465,7 @@ define("maxpanel-ember/templates/modules/index", ["exports"], function (exports)
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -2514,7 +2575,7 @@ define("maxpanel-ember/templates/servers/index", ["exports"], function (exports)
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -2576,15 +2637,18 @@ define("maxpanel-ember/templates/servers/index", ["exports"], function (exports)
         },
         buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
           var element0 = dom.childAt(fragment, [1]);
-          var morphs = new Array(5);
-          morphs[0] = dom.createMorphAt(dom.childAt(element0, [1]), 0, 0);
-          morphs[1] = dom.createMorphAt(dom.childAt(element0, [3]), 0, 0);
-          morphs[2] = dom.createMorphAt(dom.childAt(element0, [5]), 0, 0);
-          morphs[3] = dom.createMorphAt(dom.childAt(element0, [7]), 0, 0);
-          morphs[4] = dom.createMorphAt(dom.childAt(element0, [9]), 0, 0);
+          var element1 = dom.childAt(element0, [9]);
+          var morphs = new Array(7);
+          morphs[0] = dom.createAttrMorph(element0, 'class');
+          morphs[1] = dom.createMorphAt(dom.childAt(element0, [1]), 0, 0);
+          morphs[2] = dom.createMorphAt(dom.childAt(element0, [3]), 0, 0);
+          morphs[3] = dom.createMorphAt(dom.childAt(element0, [5]), 0, 0);
+          morphs[4] = dom.createMorphAt(dom.childAt(element0, [7]), 0, 0);
+          morphs[5] = dom.createAttrMorph(element1, 'class');
+          morphs[6] = dom.createMorphAt(element1, 0, 0);
           return morphs;
         },
-        statements: [["content", "server.server", ["loc", [null, [15, 12], [15, 29]]]], ["content", "server.address", ["loc", [null, [16, 12], [16, 30]]]], ["content", "server.port", ["loc", [null, [17, 12], [17, 27]]]], ["content", "server.connections", ["loc", [null, [18, 12], [18, 34]]]], ["content", "server.status", ["loc", [null, [19, 12], [19, 29]]]]],
+        statements: [["attribute", "class", ["subexpr", "listenerRowState", [["get", "server.status", ["loc", [null, [14, 36], [14, 49]]]]], [], ["loc", [null, [14, 16], [14, 51]]]]], ["content", "server.server", ["loc", [null, [15, 12], [15, 29]]]], ["content", "server.address", ["loc", [null, [16, 12], [16, 30]]]], ["content", "server.port", ["loc", [null, [17, 12], [17, 27]]]], ["content", "server.connections", ["loc", [null, [18, 12], [18, 34]]]], ["attribute", "class", ["subexpr", "cellstate", [["get", "server.status", ["loc", [null, [19, 30], [19, 43]]]]], [], ["loc", [null, [19, 18], [19, 45]]]]], ["content", "server.status", ["loc", [null, [19, 46], [19, 63]]]]],
         locals: ["server"],
         templates: []
       };
@@ -2595,7 +2659,7 @@ define("maxpanel-ember/templates/servers/index", ["exports"], function (exports)
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -2705,7 +2769,7 @@ define("maxpanel-ember/templates/services/index", ["exports"], function (exports
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -2779,7 +2843,7 @@ define("maxpanel-ember/templates/services/index", ["exports"], function (exports
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -2883,7 +2947,7 @@ define("maxpanel-ember/templates/status/index", ["exports"], function (exports) 
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -2943,7 +3007,7 @@ define("maxpanel-ember/templates/status/index", ["exports"], function (exports) 
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -3035,7 +3099,7 @@ define("maxpanel-ember/templates/variables/index", ["exports"], function (export
       return {
         meta: {
           "fragmentReason": false,
-          "revision": "Ember@2.5.0",
+          "revision": "Ember@2.5.1",
           "loc": {
             "source": null,
             "start": {
@@ -3095,7 +3159,7 @@ define("maxpanel-ember/templates/variables/index", ["exports"], function (export
           "name": "missing-wrapper",
           "problems": ["multiple-nodes"]
         },
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -3186,7 +3250,7 @@ define("maxpanel-ember/templates/welcome/index", ["exports"], function (exports)
     return {
       meta: {
         "fragmentReason": false,
-        "revision": "Ember@2.5.0",
+        "revision": "Ember@2.5.1",
         "loc": {
           "source": null,
           "start": {
@@ -3255,7 +3319,7 @@ catch(err) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("maxpanel-ember/app")["default"].create({"name":"maxpanel-ember","version":"0.0.0+9cd86aab"});
+  require("maxpanel-ember/app")["default"].create({"name":"maxpanel-ember","version":"0.0.0+c35344f7"});
 }
 
 /* jshint ignore:end */

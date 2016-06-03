@@ -31,7 +31,16 @@ define('maxpanel-ember/tests/controllers/events/index.jshint', ['exports'], func
   QUnit.module('JSHint | controllers/events/index.js');
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'controllers/events/index.js should pass jshint.');
+    assert.ok(false, 'controllers/events/index.js should pass jshint.\ncontrollers/events/index.js: line 21, col 8, Missing semicolon.\ncontrollers/events/index.js: line 33, col 6, Missing semicolon.\n\n2 errors');
+  });
+});
+define('maxpanel-ember/tests/helpers/cellstate.jshint', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | helpers/cellstate.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'helpers/cellstate.js should pass jshint.\nhelpers/cellstate.js: line 4, col 42, Missing semicolon.\nhelpers/cellstate.js: line 5, col 57, Missing semicolon.\nhelpers/cellstate.js: line 6, col 54, Missing semicolon.\nhelpers/cellstate.js: line 8, col 27, Missing semicolon.\nhelpers/cellstate.js: line 10, col 27, Missing semicolon.\nhelpers/cellstate.js: line 12, col 26, Missing semicolon.\nhelpers/cellstate.js: line 14, col 18, Missing semicolon.\n\n7 errors');
   });
 });
 define('maxpanel-ember/tests/helpers/destroy-app', ['exports', 'ember'], function (exports, _ember) {
@@ -48,6 +57,15 @@ define('maxpanel-ember/tests/helpers/destroy-app.jshint', ['exports'], function 
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
     assert.ok(true, 'helpers/destroy-app.js should pass jshint.');
+  });
+});
+define('maxpanel-ember/tests/helpers/listener-row-state.jshint', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | helpers/listener-row-state.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'helpers/listener-row-state.js should pass jshint.\nhelpers/listener-row-state.js: line 4, col 42, Missing semicolon.\nhelpers/listener-row-state.js: line 5, col 54, Missing semicolon.\nhelpers/listener-row-state.js: line 7, col 26, Missing semicolon.\nhelpers/listener-row-state.js: line 9, col 25, Missing semicolon.\nhelpers/listener-row-state.js: line 11, col 18, Missing semicolon.\n\n5 errors');
   });
 });
 define('maxpanel-ember/tests/helpers/module-for-acceptance', ['exports', 'qunit', 'maxpanel-ember/tests/helpers/start-app', 'maxpanel-ember/tests/helpers/destroy-app'], function (exports, _qunit, _maxpanelEmberTestsHelpersStartApp, _maxpanelEmberTestsHelpersDestroyApp) {
@@ -485,6 +503,44 @@ define('maxpanel-ember/tests/unit/controllers/events/index-test.jshint', ['expor
   QUnit.test('should pass jshint', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/controllers/events/index-test.js should pass jshint.');
+  });
+});
+define('maxpanel-ember/tests/unit/helpers/cellstate-test', ['exports', 'maxpanel-ember/helpers/cellstate', 'qunit'], function (exports, _maxpanelEmberHelpersCellstate, _qunit) {
+
+  (0, _qunit.module)('Unit | Helper | cellstate');
+
+  // Replace this with your real tests.
+  (0, _qunit.test)('it works', function (assert) {
+    var result = (0, _maxpanelEmberHelpersCellstate.cellstate)([42]);
+    assert.ok(result);
+  });
+});
+define('maxpanel-ember/tests/unit/helpers/cellstate-test.jshint', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | unit/helpers/cellstate-test.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/helpers/cellstate-test.js should pass jshint.');
+  });
+});
+define('maxpanel-ember/tests/unit/helpers/listener-row-state-test', ['exports', 'maxpanel-ember/helpers/listener-row-state', 'qunit'], function (exports, _maxpanelEmberHelpersListenerRowState, _qunit) {
+
+  (0, _qunit.module)('Unit | Helper | listener row state');
+
+  // Replace this with your real tests.
+  (0, _qunit.test)('it works', function (assert) {
+    var result = (0, _maxpanelEmberHelpersListenerRowState.listenerRowState)([42]);
+    assert.ok(result);
+  });
+});
+define('maxpanel-ember/tests/unit/helpers/listener-row-state-test.jshint', ['exports'], function (exports) {
+  'use strict';
+
+  QUnit.module('JSHint | unit/helpers/listener-row-state-test.js');
+  QUnit.test('should pass jshint', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/helpers/listener-row-state-test.js should pass jshint.');
   });
 });
 define('maxpanel-ember/tests/unit/models/client-test', ['exports', 'ember-qunit'], function (exports, _emberQunit) {
