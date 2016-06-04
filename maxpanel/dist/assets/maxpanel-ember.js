@@ -8,7 +8,7 @@
 
 define('maxpanel-ember/adapters/application', ['exports', 'ember-data/adapters/json-api'], function (exports, _emberDataAdaptersJsonApi) {
   exports['default'] = _emberDataAdaptersJsonApi['default'].extend({
-    host: 'http://10.190.0.5:8003'
+    namespace: 'api'
   });
 });
 define('maxpanel-ember/adapters/status', ['exports', 'ember', 'maxpanel-ember/adapters/application'], function (exports, _ember, _maxpanelEmberAdaptersApplication) {
