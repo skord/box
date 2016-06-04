@@ -48,6 +48,199 @@ define('maxpanel-ember/components/app-version', ['exports', 'ember-cli-app-versi
 define('maxpanel-ember/components/high-charts', ['exports', 'ember-highcharts/components/high-charts'], function (exports, _emberHighchartsComponentsHighCharts) {
   exports['default'] = _emberHighchartsComponentsHighCharts['default'];
 });
+define('maxpanel-ember/components/loading-slider', ['exports', 'ember'], function (exports, _ember) {
+  var Component = _ember['default'].Component;
+  var run = _ember['default'].run;
+  var isBlank = _ember['default'].isBlank;
+  var inject = _ember['default'].inject;
+  var on = _ember['default'].on;
+  exports['default'] = Component.extend({
+    tagName: 'div',
+    classNames: ['loading-slider'],
+    classNameBindings: 'expanding',
+
+    loadingSlider: inject.service(),
+
+    init: function init() {
+      this._super.apply(this, arguments);
+      run.once(this, function () {
+        this.get('loadingSlider').on('startLoading', this, this._startLoading);
+        this.get('loadingSlider').on('endLoading', this, this._endLoading);
+        this.get('loadingSlider').on('changeAttrs', this, this._changeAttrs);
+      });
+    },
+
+    setAttrsThenManage: on('didReceiveAttrs', function () {
+      this.setProperties({
+        isLoading: this.getAttr('isLoading'),
+        duration: this.getAttr('duration'),
+        expanding: this.getAttr('expanding'),
+        speed: this.getAttr('speed'),
+        color: this.getAttr('color')
+      });
+
+      this.manage();
+    }),
+
+    willDestroy: function willDestroy() {
+      run.once(this, function () {
+        this.get('loadingSlider').off('startLoading', this, this._startLoading);
+        this.get('loadingSlider').off('endLoading', this, this._endLoading);
+        this.get('loadingSlider').off('changeAttrs', this, this._changeAttrs);
+      });
+    },
+
+    _startLoading: function _startLoading() {
+      this.set('isLoading', true);
+      this.manage();
+    },
+
+    _endLoading: function _endLoading() {
+      this.set('isLoading', false);
+    },
+
+    _changeAttrs: function _changeAttrs(attrs) {
+      this.setProperties(attrs);
+      this.manage();
+    },
+
+    manage: function manage() {
+      if (isBlank(this.$())) {
+        return;
+      }
+
+      if (this.get('isLoading')) {
+        if (this.get('expanding')) {
+          this.expandingAnimate.call(this);
+        } else {
+          this.animate.call(this);
+        }
+      } else {
+        this.set('isLoaded', true);
+      }
+    },
+
+    animate: function animate() {
+      this.set('isLoaded', false);
+      var self = this,
+          elapsedTime = 0,
+          inner = $('<span>'),
+          outer = this.$(),
+          duration = this.getWithDefault('duration', 300),
+          innerWidth = 0,
+          outerWidth = this.$().width(),
+          stepWidth = Math.round(outerWidth / 50),
+          color = this.get('color');
+
+      outer.append(inner);
+      if (color) {
+        inner.css('background-color', color);
+      }
+
+      var interval = window.setInterval(function () {
+        elapsedTime = elapsedTime + 10;
+        inner.width(innerWidth = innerWidth + stepWidth);
+
+        // slow the animation if we used more than 75% the estimated duration
+        // or 66% of the animation width
+        if (elapsedTime > duration * 0.75 || innerWidth > outerWidth * 0.66) {
+          // don't stop the animation completely
+          if (stepWidth > 1) {
+            stepWidth = stepWidth * 0.97;
+          }
+        }
+
+        if (innerWidth > outerWidth) {
+          run.later(function () {
+            outer.empty();
+            window.clearInterval(interval);
+          }, 50);
+        }
+
+        // the activity has finished
+        if (self.get('isLoaded')) {
+          // start with a sizable pixel step
+          if (stepWidth < 10) {
+            stepWidth = 10;
+          }
+          // accelerate to completion
+          stepWidth = stepWidth + stepWidth;
+        }
+      }, 10);
+    },
+
+    expandingAnimate: function expandingAnimate() {
+      var self = this,
+          outer = this.$(),
+          speed = this.getWithDefault('speed', 1000),
+          colorQueue = this.get('color');
+
+      if ('object' === typeof colorQueue) {
+        (function updateFn() {
+          var color = colorQueue.shift();
+          colorQueue.push(color);
+          self.expandItem.call(self, color);
+          if (!self.get('isLoading')) {
+            outer.empty();
+          } else {
+            window.setTimeout(updateFn, speed);
+          }
+        })();
+      } else {
+        this.expandItem.call(this, colorQueue, true);
+      }
+    },
+
+    expandItem: function expandItem(color, cleanUp) {
+      var self = this,
+          inner = $('<span>').css({ 'background-color': color }),
+          outer = this.$(),
+          innerWidth = 0,
+          outerWidth = outer.width(),
+          stepWidth = Math.round(outerWidth / 50);
+      var ua = window.navigator.userAgent;
+      var ie10 = ua.indexOf("MSIE "),
+          ie11 = ua.indexOf('Trident/'),
+          ieEdge = ua.indexOf('Edge/');
+
+      outer.append(inner);
+
+      var interval = window.setInterval(function () {
+        var step = innerWidth = innerWidth + stepWidth;
+        if (innerWidth > outerWidth) {
+          window.clearInterval(interval);
+          if (cleanUp) {
+            outer.empty();
+          }
+        }
+        if (ie10 > 0 || ie11 > 0 || ieEdge > 0) {
+          inner.css({
+            'margin': '0 auto',
+            'width': step
+          });
+        } else {
+          inner.css({
+            'margin-left': '-' + step / 2 + 'px',
+            'width': step
+          });
+        }
+      }, 10);
+    },
+
+    didInsertElement: function didInsertElement() {
+      this.$().html('<span>');
+
+      var color = this.get('color');
+      if (color) {
+        this.$('span').css('background-color', color);
+      }
+
+      if (this.get('runManageInitially')) {
+        this._startLoading();
+      }
+    }
+  });
+});
 define('maxpanel-ember/components/ui-accordion', ['exports', 'semantic-ui-ember/components/ui-accordion'], function (exports, _semanticUiEmberComponentsUiAccordion) {
   exports['default'] = _semanticUiEmberComponentsUiAccordion['default'];
 });
@@ -332,6 +525,33 @@ define("maxpanel-ember/instance-initializers/ember-data", ["exports", "ember-dat
     initialize: _emberDataPrivateInstanceInitializersInitializeStoreService["default"]
   };
 });
+define('maxpanel-ember/mixins/loading-slider', ['exports', 'ember'], function (exports, _ember) {
+  var Mixin = _ember['default'].Mixin;
+  var inject = _ember['default'].inject;
+  var isPresent = _ember['default'].isPresent;
+  exports['default'] = Mixin.create({
+    loadingSlider: inject.service(),
+
+    actions: {
+      loading: function loading() {
+        var loadingSliderService = this.get('loadingSlider');
+        loadingSliderService.startLoading();
+        if (isPresent(this.router)) {
+          this.router.one('didTransition', function () {
+            loadingSliderService.endLoading();
+          });
+        }
+        if (this.get('bubbleLoadingSlider')) {
+          return true;
+        }
+      },
+
+      finished: function finished() {
+        this.get('loadingSlider').endLoading();
+      }
+    }
+  });
+});
 define('maxpanel-ember/models/client', ['exports', 'ember-data'], function (exports, _emberData) {
   exports['default'] = _emberData['default'].Model.extend({
     session: _emberData['default'].attr('string'),
@@ -429,6 +649,9 @@ define('maxpanel-ember/router', ['exports', 'ember', 'maxpanel-ember/config/envi
   });
 
   exports['default'] = Router;
+});
+define('maxpanel-ember/routes/application', ['exports', 'ember', 'maxpanel-ember/mixins/loading-slider'], function (exports, _ember, _maxpanelEmberMixinsLoadingSlider) {
+  exports['default'] = _ember['default'].Route.extend(_maxpanelEmberMixinsLoadingSlider['default'], {});
 });
 define('maxpanel-ember/routes/clients/index', ['exports', 'ember'], function (exports, _ember) {
   exports['default'] = _ember['default'].Route.extend({
@@ -940,6 +1163,23 @@ define('maxpanel-ember/services/ajax', ['exports', 'ember-ajax/services/ajax'], 
     }
   });
 });
+define('maxpanel-ember/services/loading-slider', ['exports', 'ember'], function (exports, _ember) {
+  var Service = _ember['default'].Service;
+  var Evented = _ember['default'].Evented;
+  exports['default'] = Service.extend(Evented, {
+    startLoading: function startLoading() {
+      this.trigger('startLoading');
+    },
+
+    endLoading: function endLoading() {
+      this.trigger('endLoading');
+    },
+
+    changeAttrs: function changeAttrs(attrs) {
+      this.trigger('changeAttrs', attrs);
+    }
+  });
+});
 define("maxpanel-ember/templates/application", ["exports"], function (exports) {
   exports["default"] = Ember.HTMLBars.template((function () {
     var child0 = (function () {
@@ -1322,7 +1562,7 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
             "column": 0
           },
           "end": {
-            "line": 42,
+            "line": 43,
             "column": 0
           }
         },
@@ -1373,6 +1613,10 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
         dom.appendChild(el1, el2);
         var el2 = dom.createComment("");
         dom.appendChild(el1, el2);
+        var el2 = dom.createTextNode("\n  ");
+        dom.appendChild(el1, el2);
+        var el2 = dom.createComment("");
+        dom.appendChild(el1, el2);
         var el2 = dom.createTextNode("\n");
         dom.appendChild(el1, el2);
         dom.appendChild(el0, el1);
@@ -1382,7 +1626,8 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
       },
       buildRenderNodes: function buildRenderNodes(dom, fragment, contextualElement) {
         var element0 = dom.childAt(fragment, [0]);
-        var morphs = new Array(11);
+        var element1 = dom.childAt(fragment, [2]);
+        var morphs = new Array(12);
         morphs[0] = dom.createMorphAt(element0, 1, 1);
         morphs[1] = dom.createMorphAt(element0, 2, 2);
         morphs[2] = dom.createMorphAt(element0, 3, 3);
@@ -1393,10 +1638,11 @@ define("maxpanel-ember/templates/application", ["exports"], function (exports) {
         morphs[7] = dom.createMorphAt(element0, 8, 8);
         morphs[8] = dom.createMorphAt(element0, 9, 9);
         morphs[9] = dom.createMorphAt(element0, 10, 10);
-        morphs[10] = dom.createMorphAt(dom.childAt(fragment, [2]), 1, 1);
+        morphs[10] = dom.createMorphAt(element1, 1, 1);
+        morphs[11] = dom.createMorphAt(element1, 3, 3);
         return morphs;
       },
-      statements: [["block", "link-to", ["index"], ["class", "item"], 0, null, ["loc", [null, [2, 2], [4, 14]]]], ["block", "link-to", ["variables.index"], ["class", "item"], 1, null, ["loc", [null, [5, 2], [7, 14]]]], ["block", "link-to", ["status.index"], ["class", "item"], 2, null, ["loc", [null, [8, 2], [10, 14]]]], ["block", "link-to", ["services.index"], ["class", "item"], 3, null, ["loc", [null, [11, 2], [13, 14]]]], ["block", "link-to", ["listeners.index"], ["class", "item"], 4, null, ["loc", [null, [14, 2], [16, 14]]]], ["block", "link-to", ["modules.index"], ["class", "item"], 5, null, ["loc", [null, [17, 2], [19, 14]]]], ["block", "link-to", ["maxscale_sessions.index"], ["class", "item"], 6, null, ["loc", [null, [20, 2], [22, 14]]]], ["block", "link-to", ["clients.index"], ["class", "item"], 7, null, ["loc", [null, [23, 2], [25, 14]]]], ["block", "link-to", ["servers.index"], ["class", "item"], 8, null, ["loc", [null, [26, 2], [28, 14]]]], ["block", "link-to", ["events.index"], ["class", "item"], 9, null, ["loc", [null, [29, 2], [31, 14]]]], ["content", "outlet", ["loc", [null, [40, 2], [40, 12]]]]],
+      statements: [["block", "link-to", ["index"], ["class", "item"], 0, null, ["loc", [null, [2, 2], [4, 14]]]], ["block", "link-to", ["variables.index"], ["class", "item"], 1, null, ["loc", [null, [5, 2], [7, 14]]]], ["block", "link-to", ["status.index"], ["class", "item"], 2, null, ["loc", [null, [8, 2], [10, 14]]]], ["block", "link-to", ["services.index"], ["class", "item"], 3, null, ["loc", [null, [11, 2], [13, 14]]]], ["block", "link-to", ["listeners.index"], ["class", "item"], 4, null, ["loc", [null, [14, 2], [16, 14]]]], ["block", "link-to", ["modules.index"], ["class", "item"], 5, null, ["loc", [null, [17, 2], [19, 14]]]], ["block", "link-to", ["maxscale_sessions.index"], ["class", "item"], 6, null, ["loc", [null, [20, 2], [22, 14]]]], ["block", "link-to", ["clients.index"], ["class", "item"], 7, null, ["loc", [null, [23, 2], [25, 14]]]], ["block", "link-to", ["servers.index"], ["class", "item"], 8, null, ["loc", [null, [26, 2], [28, 14]]]], ["block", "link-to", ["events.index"], ["class", "item"], 9, null, ["loc", [null, [29, 2], [31, 14]]]], ["content", "outlet", ["loc", [null, [40, 2], [40, 12]]]], ["inline", "loading-slider", [], ["isLoading", ["subexpr", "@mut", [["get", "loading", ["loc", [null, [41, 29], [41, 36]]]]], [], []], "duration", 250], ["loc", [null, [41, 2], [41, 51]]]]],
       locals: [],
       templates: [child0, child1, child2, child3, child4, child5, child6, child7, child8, child9]
     };
@@ -3319,7 +3565,7 @@ catch(err) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("maxpanel-ember/app")["default"].create({"name":"maxpanel-ember","version":"0.0.0+c35344f7"});
+  require("maxpanel-ember/app")["default"].create({"name":"maxpanel-ember","version":"0.0.0+896a8276"});
 }
 
 /* jshint ignore:end */
