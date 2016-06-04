@@ -22,6 +22,8 @@ backend:
   build: nginx
   links:
     - maxscale
+  expose:
+    - 8003
   ports:
     - 8003:8003
 

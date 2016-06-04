@@ -664,14 +664,14 @@ define('maxpanel-ember/routes/clients/index', ['exports', 'ember'], function (ex
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('client');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -692,14 +692,14 @@ define('maxpanel-ember/routes/events/index', ['exports', 'ember'], function (exp
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('event');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -727,14 +727,14 @@ define('maxpanel-ember/routes/listeners/index', ['exports', 'ember'], function (
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('listener');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -755,14 +755,14 @@ define('maxpanel-ember/routes/maxscale-sessions/index', ['exports', 'ember'], fu
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('maxscale-session');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -783,14 +783,14 @@ define('maxpanel-ember/routes/modules/index', ['exports', 'ember'], function (ex
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('module');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -811,14 +811,14 @@ define('maxpanel-ember/routes/servers/index', ['exports', 'ember'], function (ex
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('server');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -839,14 +839,14 @@ define('maxpanel-ember/routes/services/index', ['exports', 'ember'], function (e
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('service');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -867,14 +867,14 @@ define('maxpanel-ember/routes/status/index', ['exports', 'ember'], function (exp
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('status');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -895,14 +895,14 @@ define('maxpanel-ember/routes/variables/index', ['exports', 'ember'], function (
     },
     startRefreshing: function startRefreshing() {
       this.set('refreshing', true);
-      _ember['default'].run.later(this, this.refresh, 1000);
+      _ember['default'].run.later(this, this.refresh, 2000);
     },
     refresh: function refresh() {
       if (!this.get('refreshing')) {
         return;
       } else {
         this.store.findAll('variable');
-        _ember['default'].run.later(this, this.refresh, 1000);
+        _ember['default'].run.later(this, this.refresh, 2000);
       }
     },
     actions: {
@@ -3565,7 +3565,7 @@ catch(err) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("maxpanel-ember/app")["default"].create({"name":"maxpanel-ember","version":"0.0.0+896a8276"});
+  require("maxpanel-ember/app")["default"].create({"name":"maxpanel-ember","version":"0.0.0+4806fca5"});
 }
 
 /* jshint ignore:end */
