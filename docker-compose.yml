@@ -17,14 +17,6 @@ maxscale:
     - 4006:4006
     - 6603:6603
     - 9003:9003
-
-backend:
-  build: nginx
-  links:
-    - maxscale
-  expose:
-    - 8003
-  ports:
     - 8003:8003
 
 maxpanel:
@@ -32,4 +24,4 @@ maxpanel:
   ports:
     - 8080:80
   links:
-    - backend
+    - maxscale
