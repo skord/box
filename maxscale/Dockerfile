@@ -10,6 +10,7 @@ RUN tar zxvf mariadb-connector-c-2.2.3-src.tar.gz
 WORKDIR /root/mariadb-connector-c-2.2.3-src
 RUN cmake .
 RUN make && make install
+RUN echo "/usr/local/lib/mariadb/" > /etc/ld.so.conf.d/mariadb.conf && ldconfig
 WORKDIR /root/MaxScale
 RUN git checkout develop
 RUN mkdir build
